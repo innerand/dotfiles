@@ -1,0 +1,7 @@
+# Configuration of mako notification daeomn
+
+# Default timeout in milliseconds
+default-timeout=10000
+
+# Position of notifications
+anchor=bottom-right

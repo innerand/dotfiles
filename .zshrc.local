@@ -1,0 +1,8 @@
+export PATH="$HOME/bin:$HOME/.local/bin:$HOME/.cargo/bin:$PATH"
+
+alias vim="nvim"
+alias vi="nvim"
+alias please="sudo"
+alias dotgit='/usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
+
+plugins=(... git gitfast)
