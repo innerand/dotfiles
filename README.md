@@ -1,7 +1,9 @@
 # Dotfiles 
 
+My personal dotfiles. 
+
 ## Repository 
-A bare repository and an alias is used to directly track dotfiles inside the
+A bare repository and a git alias is used to directly track dotfiles inside the
 home directory without messing up other git repos. 
 
 ### Setup 

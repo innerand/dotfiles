@@ -19,6 +19,11 @@ set $left h
 set $down j
 set $up k
 set $right l
+
+# Page up / down key
+set $PageUp Prior
+set $PageDown Next
+
 # Your preferred terminal emulator
 set $term alacritty
 
@@ -45,8 +50,9 @@ output * bg /usr/share/backgrounds/sway/Sway_Wallpaper_Blue_1920x1080.png fill
 #
 exec swayidle -w \
          timeout 300 'swaylock -f -c 000000' \
+         timeout 900 'systemctl suspend' \
          timeout 600 'swaymsg "output * dpms off"' resume 'swaymsg "output * dpms on"' \
-         before-sleep 'swaylock -f -c 000000'
+         before-sleep 'swaylock -f -c 000000' \
 #
 # This will lock your screen after 300 seconds of inactivity, then turn off
 # your displays after another 300 seconds, and turn your screens back on when
@@ -103,6 +109,9 @@ input type:touchpad {
 
     # Exit sway (logs you out of your Wayland session)
     bindsym $mod+Shift+e exec swaynag -t warning -m 'You pressed the exit shortcut. Do you really want to exit sway? This will end your Wayland session.' -B 'Yes, exit sway' 'swaymsg exit'
+
+    # Lock screen
+    bindsym Control+Alt+l exec 'swaylock -f -c 000000'
 #
 # Moving around:
 #
@@ -116,6 +125,9 @@ input type:touchpad {
     bindsym $mod+Down focus down
     bindsym $mod+Up focus up
     bindsym $mod+Right focus right
+    # Gnome like
+    bindsym Mod4+Tab focus right
+    bindsym Mod4+Tab+Shift focus left
 
     # Move the focused window with the same, but add Shift
     bindsym $mod+Shift+$left move left
@@ -154,6 +166,35 @@ input type:touchpad {
     bindsym $mod+Shift+0 move container to workspace number 10
     # Note: workspaces can have any name you want, not just numbers.
     # We just use 1-10 as the default.
+
+    # Switch workspace
+    bindsym $mod+Control+$right workspace next
+    bindsym $mod+Control+$left  workspace prev
+    bindsym $mod+Control+Right workspace next
+    bindsym $mod+Control+Left  workspace prev
+    # Gnome like
+    bindsym Mod4+$PageUp workspace next
+    bindsym Mod4+$PageDown workspace prev
+
+    # Move focused container to workspace
+    bindsym $mod+Control+Shift+$right move container to workspace next
+    bindsym $mod+Control+Shift+$left  move container to workspace prev
+    bindsym $mod+Control+Shift+Right move container to workspace next
+    bindsym $mod+Control+Shift+Left  move container to workspace prev
+    # Gnome like
+    bindsym Mod4+Shift+$PageUp move container to workspace next
+    bindsym Mod4+Shift+$PageDown move container workspace prev
+
+    # Move workspace to output
+    bindsym $mod+Alt+Shift+$right move workspace to output right
+    bindsym $mod+Alt+Shift+$left move workspace to output left
+    bindsym $mod+Alt+Shift+$down move workspace to output down
+    bindsym $mod+Alt+Shift+$up move workspace to output up
+
+    bindsym $mod+Alt+Shift+Right move workspace to output right
+    bindsym $mod+Alt+Shift+Left move workspace to output left
+    bindsym $mod+Alt+Shift+Down move workspace to output down
+    bindsym $mod+Alt+Shift+Up move workspace to output up
 #
 # Layout stuff:
 #
@@ -196,16 +237,17 @@ input type:touchpad {
 # Fn -Kes
 #
 # --locked flags allow the buttons to be used whilst the screen is locked.
-bindsym --locked XF86AudioRaiseVolume exec pactl set-sink-volume @DEFAULT_SINK@ +5%
-bindsym --locked XF86AudioLowerVolume exec pactl set-sink-volume @DEFAULT_SINK@ -5%
-bindsym --locked XF86AudioMute exec pactl set-sink-mute @DEFAULT_SINK@ toggle
-bindsym XF86AudioMicMute exec pactl set-source-mute @DEFAULT_SOURCE@ toggle
-bindsym --locked XF86MonBrightnessDown exec brightnessctl set 5%-
-bindsym --locked XF86MonBrightnessUp exec brightnessctl set 5%+
-bindsym --locked XF86AudioPlay exec playerctl play-pause
-bindsym XF86AudioNext exec playerctl next
-bindsym XF86AudioPrev exec playerctl previous
-bindsym XF86Search exec $menu
+    bindsym --locked XF86AudioRaiseVolume exec pactl set-sink-volume @DEFAULT_SINK@ +5%
+    bindsym --locked XF86AudioLowerVolume exec pactl set-sink-volume @DEFAULT_SINK@ -5%
+    bindsym --locked XF86AudioMute exec pactl set-sink-mute @DEFAULT_SINK@ toggle
+    bindsym XF86AudioMicMute exec pactl set-source-mute @DEFAULT_SOURCE@ toggle
+    bindsym --locked XF86MonBrightnessDown exec brightnessctl set 5%-
+    bindsym --locked XF86MonBrightnessUp exec brightnessctl set 5%+
+    bindsym --locked XF86AudioPlay exec playerctl play-pause
+    bindsym XF86AudioNext exec playerctl next
+    bindsym XF86AudioPrev exec playerctl previous
+    bindsym XF86Search exec $menu
+
 #
 # Resizing containers:
 #
@@ -234,14 +276,7 @@ bindsym $mod+r mode "resize"
 #
 # Assignments
 #
-assign [class=$default-web-browser]         3
-assign [class=$default-web-browser-class]   3
-assign [class="(?i)firefox"]                3
-
-for_window [class=$default-web-browser]         workspace 3
-for_window [class=$default-web-browser-class]   workspace 3
-for_window [class="(?i)firefox"]                workspace 3
-
+for_window [app_id="floating"] floating enable
 
 
 # Status Bar:
@@ -275,3 +310,6 @@ default_border pixel
 #
 
 # include /etc/sway/config.d/*
+
+# see https://github.com/swaywm/sway/wiki#gtk-applications-take-20-seconds-to-start
+exec dbus-update-activation-environment --systemd DISPLAY WAYLAND_DISPLAY SWAYSOCK
