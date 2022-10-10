@@ -33,6 +33,9 @@ set $term alacritty
 set $menu wofi -i --show drun | xargs swaymsg exec --
 #set $menu dmenu_path | dmenu | xargs swaymsg exec --
 
+set $lock 'loginctl lock-session'
+
+
 ### Output configuration
 #
 # Default wallpaper (more resolutions are available in /usr/share/backgrounds/sway/)
@@ -49,10 +52,11 @@ output * bg /usr/share/backgrounds/sway/Sway_Wallpaper_Blue_1920x1080.png fill
 # Example configuration:
 #
 exec swayidle -w \
-         timeout 300 'swaylock -f -c 000000' \
+         timeout 300  'swaylock -f -c 000000' \
+         timeout 360 'swaymsg "output * dpms off"' resume 'swaymsg "output * dpms on"' \
          timeout 900 'systemctl suspend' \
-         timeout 600 'swaymsg "output * dpms off"' resume 'swaymsg "output * dpms on"' \
-         before-sleep 'swaylock -f -c 000000' \
+         lock 'swaylock -f -c 000000' \
+         before-sleep 'swaylock -f -c 000000'\
 #
 # This will lock your screen after 300 seconds of inactivity, then turn off
 # your displays after another 300 seconds, and turn your screens back on when
@@ -63,6 +67,8 @@ exec swayidle -w \
 input type:keyboard {
     xkb_layout "gb,at,us"
     xkb_variant "gb_umlauts,nodeadkeys"
+    repeat_delay 250
+    repeat_rate 25
 }
 
 input type:touchpad {
@@ -111,7 +117,7 @@ input type:touchpad {
     bindsym $mod+Shift+e exec swaynag -t warning -m 'You pressed the exit shortcut. Do you really want to exit sway? This will end your Wayland session.' -B 'Yes, exit sway' 'swaymsg exit'
 
     # Lock screen
-    bindsym Control+Alt+l exec 'swaylock -f -c 000000'
+    bindsym Control+Alt+l exec $lock
 #
 # Moving around:
 #
@@ -252,20 +258,53 @@ input type:touchpad {
 # Resizing containers:
 #
 mode "resize" {
+    set $slow 10px
+    set $fast 80px
+
     # left will shrink the containers width
     # right will grow the containers width
     # up will shrink the containers height
     # down will grow the containers height
-    bindsym $left resize shrink width 10px
-    bindsym $down resize grow height 10px
-    bindsym $up resize shrink height 10px
-    bindsym $right resize grow width 10px
+    bindsym $left resize shrink width $slow
+    bindsym $down resize grow height $slow
+    bindsym $up resize shrink height $slow
+    bindsym $right resize grow width $slow
+
+    bindsym Shift+$left resize shrink width $fast
+    bindsym Shift+$down resize grow height $fast
+    bindsym Shift+$up resize shrink height $fast
+    bindsym Shift+$right resize grow width $fast
 
     # Ditto, with arrow keys
-    bindsym Left resize shrink width 10px
-    bindsym Down resize grow height 10px
-    bindsym Up resize shrink height 10px
-    bindsym Right resize grow width 10px
+    bindsym Left resize shrink width $slow
+    bindsym Down resize grow height $slow
+    bindsym Up resize shrink height $slow
+    bindsym Right resize grow width $slow
+
+    bindsym Shift+Left resize shrink width $fast
+    bindsym Shift+Down resize grow height $fast
+    bindsym Shift+Up resize shrink height $fast
+    bindsym Shift+Right resize grow width $fast
+
+    bindsym 1 resize set width 10ppt
+    bindsym 2 resize set width 20ppt
+    bindsym 3 resize set width 30ppt
+    bindsym 4 resize set width 40ppt
+    bindsym 5 resize set width 50ppt
+    bindsym 6 resize set width 60ppt
+    bindsym 7 resize set width 70ppt
+    bindsym 8 resize set width 80ppt
+    bindsym 9 resize set width 90ppt
+
+    bindsym Shift+1 resize set height 10ppt
+    bindsym Shift+2 resize set height 20ppt
+    bindsym Shift+3 resize set height 30ppt
+    bindsym Shift+4 resize set height 40ppt
+    bindsym Shift+5 resize set height 50ppt
+    bindsym Shift+6 resize set height 60ppt
+    bindsym Shift+7 resize set height 70ppt
+    bindsym Shift+8 resize set height 80ppt
+    bindsym Shift+9 resize set height 90ppt
 
     # Return to default mode
     bindsym Return mode "default"
@@ -305,11 +344,17 @@ bar {
 #
 default_border pixel
 
+# include /etc/sway/config.d/*
+
 #
 # Autostart
 #
 
-# include /etc/sway/config.d/*
-
 # see https://github.com/swaywm/sway/wiki#gtk-applications-take-20-seconds-to-start
 exec dbus-update-activation-environment --systemd DISPLAY WAYLAND_DISPLAY SWAYSOCK
+
+# gnome keyring
+exec gnome-keyring-daemon --start --components=pkcs11,secrets,ssh
+
+# pw mangager
+exec unlock_todo
