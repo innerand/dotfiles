@@ -118,6 +118,12 @@ input type:touchpad {
 
     # Lock screen
     bindsym Control+Alt+l exec $lock
+
+    # Screenshot
+    set $screenshot ~/Pictures/screenshot-"$(date +%F-%T)".png
+    bindsym $mod+Print exec grim -g "$(slurp)" $screenshot
+    bindsym $mod+Shift+Print exec grim $screenshot
+
 #
 # Moving around:
 #
@@ -248,6 +254,7 @@ input type:touchpad {
     bindsym --locked XF86AudioMute exec pactl set-sink-mute @DEFAULT_SINK@ toggle
     bindsym XF86AudioMicMute exec pactl set-source-mute @DEFAULT_SOURCE@ toggle
     bindsym --locked XF86MonBrightnessDown exec brightnessctl set 5%-
+    bindsym --locked $mod+Minus exec brightnessctl set 1%-
     bindsym --locked XF86MonBrightnessUp exec brightnessctl set 5%+
     bindsym --locked XF86AudioPlay exec playerctl play-pause
     bindsym XF86AudioNext exec playerctl next
@@ -352,6 +359,9 @@ default_border pixel
 
 # see https://github.com/swaywm/sway/wiki#gtk-applications-take-20-seconds-to-start
 exec dbus-update-activation-environment --systemd DISPLAY WAYLAND_DISPLAY SWAYSOCK
+
+# Notifications
+exec mako
 
 # gnome keyring
 exec gnome-keyring-daemon --start --components=pkcs11,secrets,ssh
